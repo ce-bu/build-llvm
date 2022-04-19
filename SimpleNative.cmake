@@ -25,10 +25,6 @@ set(CMAKE_C_FLAGS "-fPIC" CACHE STRING "")
 set(CMAKE_CXX_FLAGS "-fPIC" CACHE STRING "")
 
   
-# setup toolchain
-set(LLVM_INSTALL_TOOLCHAIN_ONLY ON CACHE BOOL "")
-
-# added by add_llvm_tool (it creates a component with the tool name)
 
 set(LLVM_TOOLCHAIN_TOOLS
   dsymutil
@@ -80,4 +76,13 @@ set(LLVM_DISTRIBUTION_COMPONENTS
   builtins
   runtimes
   ${LLVM_TOOLCHAIN_TOOLS}
+
+  # LLVM
+  cmake-exports
+  llvm-headers
+  llvm-libraries
+  # Clang
+  clang-cmake-exports
+  clang-headers
+  clang-libraries  
   CACHE STRING "")

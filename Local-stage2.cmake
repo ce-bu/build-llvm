@@ -1,4 +1,7 @@
-# to refresh stage2 remove build/tools/clang/stage2-stamps/stage2-configure, build/tools/clang/stage2-bins/CMakeCache.txt and run ninja tools/clang/stage2-stamps/stage2-configure
+# to refresh stage2:
+# cd build
+# rm tools/clang/stage2-stamps/stage2-configure tools/clang/stage2-bins/CMakeCache.txt
+# ninja tools/clang/stage2-stamps/stage2-configure
 
 
 set(LLVM_ENABLE_PROJECTS "clang;clang-tools-extra;lld;llvm;lldb" CACHE STRING "")
@@ -30,7 +33,7 @@ set(CMAKE_CXX_FLAGS "-fPIC" CACHE STRING "")
 set(Python3_EXECUTABLE "" CACHE STRING "")
   
 # setup toolchain
-set(LLVM_INSTALL_TOOLCHAIN_ONLY ON CACHE BOOL "")
+#set(LLVM_INSTALL_TOOLCHAIN_ONLY ON CACHE BOOL "")
 
 # added by add_llvm_tool (it creates a component with the tool name)
 
@@ -84,4 +87,13 @@ set(LLVM_DISTRIBUTION_COMPONENTS
   builtins
   runtimes
   ${LLVM_TOOLCHAIN_TOOLS}
+
+  # LLVM
+  cmake-exports
+  llvm-headers
+  llvm-libraries
+  # Clang
+  clang-cmake-exports
+  clang-headers
+  clang-libraries  
   CACHE STRING "")

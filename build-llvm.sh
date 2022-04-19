@@ -36,19 +36,20 @@ B=$S/build
 
 llvm-bootstrap()
 {
+    set -x
     mkdir -p $B
     sudo rm -rf $B/*
     cd $B
     CC=gcc CXX=g++ $CMAKE -G Ninja \
       -DCMAKE_INSTALL_PREFIX="$D" \
-      -DPython3_EXECUTABLE=$PYTHON3 \      
+      -DPython3_EXECUTABLE=$PYTHON3 \
       -C $root_dir/Local.cmake "$S/llvm"
 
     cd $B
     ninja clang-bootstrap-deps
     ninja stage2-distribution
     sudo ninja stage2-install-distribution-stripped
-    
+    sudo ninja install-cmake-exports
 }
 
 
@@ -61,19 +62,20 @@ llvm-simplenative()
       -DCMAKE_INSTALL_PREFIX="$D" \
       -DPython3_EXECUTABLE=$PYTHON3 \
       -C $root_dir/SimpleNative.cmake "$S/llvm"
-
-    
+    cd $B
+    ninja
+    sudo ninja install-distribution-stripped
 }
-
 
 
 llvm-updatecache()
 {
     c=/etc/ld.so.conf.d/llvm14.conf
     echo $D/lib | sudo tee $c
-    echo $D/lib/x86_64-unknown-linux-gnu/c++ | sudo tee -a $c
+    echo $D/lib/x86_64-unknown-linux-gnu | sudo tee -a $c
     sudo ldconfig
 }
 
 llvm-$T
+
 

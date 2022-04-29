@@ -49,7 +49,7 @@ llvm-bootstrap()
     ninja clang-bootstrap-deps
     ninja stage2-distribution
     sudo ninja stage2-install-distribution-stripped
-    sudo ninja install-cmake-exports
+    (cd /home/ubuser/src/llvm-project/build/tools/clang/stage2-bins; sudo ninja install-cmake-exports)
     (cd /home/ubuser/src/llvm-project/build/tools/clang/stage2-bins; sudo ninja install-lldb-python-scripts-stripped)
 }
 

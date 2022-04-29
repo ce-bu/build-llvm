@@ -1,7 +1,6 @@
 # to refresh stage2:
 # cd build
-# rm tools/clang/stage2-stamps/stage2-configure tools/clang/stage2-bins/CMakeCache.txt
-# ninja tools/clang/stage2-stamps/stage2-configure
+# rm tools/clang/stage2-stamps/stage2-configure tools/clang/stage2-bins/CMakeCache.txt; ninja tools/clang/stage2-stamps/stage2-configure
 
 
 set(LLVM_ENABLE_PROJECTS "clang;clang-tools-extra;lld;llvm;lldb" CACHE STRING "")
@@ -21,11 +20,15 @@ set(COMPILER_RT_USE_BUILTINS_LIBRARY ON CACHE BOOL "")
 set(LLVM_ENABLE_RTTI ON CACHE BOOL "")
 set(LLVM_ENABLE_EH ON CACHE BOOL "")
 set(LLVM_ENABLE_LLD ON CACHE BOOL "")
+set(LLVM_BUILD_LLVM_DYLIB ON CACHE BOOL "")
+set(LLVM_LINK_LLVM_DYLIB ON CACHE BOOL "")
 
 set(LIBUNWIND_USE_COMPILER_RT ON CACHE BOOL "")
 set(LIBCXX_USE_COMPILER_RT ON CACHE BOOL "")
 set(LIBCXXABI_USE_COMPILER_RT ON CACHE BOOL "")
 set(LIBCXXABI_USE_LLVM_UNWINDER ON CACHE BOOL "")
+
+set(LLDB_INCLUDE_TESTS OFF CACHE BOOL "")
 
 set(CMAKE_C_FLAGS "-fPIC" CACHE STRING "")
 set(CMAKE_CXX_FLAGS "-fPIC" CACHE STRING "")
@@ -33,7 +36,7 @@ set(CMAKE_CXX_FLAGS "-fPIC" CACHE STRING "")
 set(Python3_EXECUTABLE "" CACHE STRING "")
   
 # setup toolchain
-#set(LLVM_INSTALL_TOOLCHAIN_ONLY ON CACHE BOOL "")
+set(LLVM_INSTALL_TOOLCHAIN_ONLY OFF CACHE BOOL "")
 
 # added by add_llvm_tool (it creates a component with the tool name)
 
@@ -74,6 +77,7 @@ set(LLVM_DISTRIBUTION_COMPONENTS
   lld
   lldb
   liblldb
+  lldb-server
   LTO
   clang-apply-replacements
   clang-doc
@@ -95,5 +99,6 @@ set(LLVM_DISTRIBUTION_COMPONENTS
   # Clang
   clang-cmake-exports
   clang-headers
-  clang-libraries  
+  clang-libraries
+  
   CACHE STRING "")

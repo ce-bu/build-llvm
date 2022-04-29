@@ -50,6 +50,7 @@ llvm-bootstrap()
     ninja stage2-distribution
     sudo ninja stage2-install-distribution-stripped
     sudo ninja install-cmake-exports
+    (cd /home/ubuser/src/llvm-project/build/tools/clang/stage2-bins; sudo ninja install-lldb-python-scripts-stripped)
 }
 
 
@@ -74,6 +75,20 @@ llvm-updatecache()
     echo $D/lib | sudo tee $c
     echo $D/lib/x86_64-unknown-linux-gnu | sudo tee -a $c
     sudo ldconfig
+}
+
+llvm-alternatives()
+{
+    set -x
+    sudo bash -c " \
+    rm -f /usr/bin/c++ ;  rm -f /bin/c++ ; rm -f /bin/cc ; \
+    update-alternatives --remove-all cc ;\
+    update-alternatives --remove-all c++ ;\
+    update-alternatives --install /usr/bin/cc cc  $D/bin/clang 100 ;\
+    update-alternatives --install /usr/bin/c++ c++ $D/bin/clang++ 100 ;\
+    update-alternatives --install /usr/bin/clang clang $D/bin/clang 100 ;\
+    update-alternatives --install /usr/bin/clang++ clang++ $D/bin/clang++ 100 \
+    "
 }
 
 llvm-$T

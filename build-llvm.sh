@@ -5,7 +5,7 @@ pushd $(dirname $0) > /dev/null
 root_dir=$(pwd)
 popd > /dev/null
 
-D=/opt/llvm-14.0.1
+D=/opt/llvm-14.0.6
 CMAKE=/opt/cmake/bin/cmake
 T=bootstrap
 PYTHON3=$(realpath $(which python3))

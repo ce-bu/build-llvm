@@ -5,10 +5,8 @@ pushd $(dirname $0) > /dev/null
 root_dir=$(pwd)
 popd > /dev/null
 
-D=/opt/llvm-14.0.1
-CMAKE=/opt/cmake/bin/cmake
-T=bootstrap
-PYTHON3=$(realpath $(which python3))
+D=/opt/llvm-15.0.7
+cmake=/opt/cmake/bin/cmake
 
 while [[ ! -z $1 ]]; do
     arg=$1
@@ -21,10 +19,6 @@ while [[ ! -z $1 ]]; do
             shift
             D=$1
             ;;
-        -t)
-            shift
-            T=$1
-            ;;
         *)            
     esac
     shift
@@ -34,46 +28,48 @@ done
 
 B=$S/build
 
-llvm-bootstrap()
+llvm-Prep-Local()
 {
+    set -x
     mkdir -p $B
     sudo rm -rf $B/*
     cd $B
-    CC=gcc CXX=g++ $CMAKE -G Ninja \
+    CC=gcc CXX=g++ $cmake -G Ninja \
       -DCMAKE_INSTALL_PREFIX="$D" \
-      -DPython3_EXECUTABLE=$PYTHON3 \      
       -C $root_dir/Local.cmake "$S/llvm"
-
-    cd $B
-    ninja clang-bootstrap-deps
-    ninja stage2-distribution
-    sudo ninja stage2-install-distribution-stripped
-    
 }
 
-
-llvm-simplenative()
-{
-    mkdir -p $B
-    sudo rm -rf $B/*
-    cd $B
-    CC=gcc CXX=g++ $CMAKE -G Ninja \
-      -DCMAKE_INSTALL_PREFIX="$D" \
-      -DPython3_EXECUTABLE=$PYTHON3 \
-      -C $root_dir/SimpleNative.cmake "$S/llvm"
-
+llvm-Build-Local()
+{    
+    $cmake --build $B --target clang-bootstrap-deps
+    $cmake --build $B --target stage2-distribution
+    sudo $cmake --build $B --target install stage2-install-distribution-stripped
+    sudo $cmake --build $B --target install stage2-install
     
 }
-
-
 
 llvm-updatecache()
 {
-    c=/etc/ld.so.conf.d/llvm14.conf
+    c=/etc/ld.so.conf.d/llvm15.conf
     echo $D/lib | sudo tee $c
-    echo $D/lib/x86_64-unknown-linux-gnu/c++ | sudo tee -a $c
+    echo $D/lib/x86_64-unknown-linux-gnu | sudo tee -a $c
     sudo ldconfig
 }
 
-llvm-$T
+llvm-alternatives()
+{
+    set -x
+    sudo bash -c " \
+    rm -f /usr/bin/c++ ;  rm -f /bin/c++ ; rm -f /bin/cc ; \
+    update-alternatives --remove-all cc ;\
+    update-alternatives --remove-all c++ ;\
+    update-alternatives --install /usr/bin/cc cc  $D/bin/clang 100 ;\
+    update-alternatives --install /usr/bin/c++ c++ $D/bin/clang++ 100 ;\
+    update-alternatives --install /usr/bin/clang clang $D/bin/clang 100 ;\
+    update-alternatives --install /usr/bin/clang++ clang++ $D/bin/clang++ 100 \
+    "
+}
 
+llvm-Prep-Local
+llvm-Build-Local
+llvm-updatecache

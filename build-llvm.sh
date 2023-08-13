@@ -48,6 +48,11 @@ llvm-Build-Local()
     
 }
 
+llvm-strip()
+{
+    find /opt/llvm-15.0.7/bin/ -type f -executable -exec sudo /opt/llvm-15.0.7/bin/llvm-strip --strip-unneeded {}  \;
+
+}
 llvm-updatecache()
 {
     c=/etc/ld.so.conf.d/llvm15.conf
@@ -70,6 +75,6 @@ llvm-alternatives()
     "
 }
 
-llvm-Prep-Local
-llvm-Build-Local
-llvm-updatecache
+#llvm-Prep-Local
+#llvm-Build-Local
+#llvm-updatecache

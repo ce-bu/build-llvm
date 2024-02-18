@@ -5,8 +5,8 @@ pushd $(dirname $0) > /dev/null
 root_dir=$(pwd)
 popd > /dev/null
 
-D=/opt/llvm-15.0.7
-cmake=/opt/cmake/bin/cmake
+D=~/opt/llvm-17.0.6
+cmake=cmake
 
 while [[ ! -z $1 ]]; do
     arg=$1
@@ -32,7 +32,6 @@ llvm-Prep-Local()
 {
     set -x
     mkdir -p $B
-    sudo rm -rf $B/*
     cd $B
     CC=gcc CXX=g++ $cmake -G Ninja \
       -DCMAKE_INSTALL_PREFIX="$D" \
@@ -43,25 +42,38 @@ llvm-Build-Local()
 {    
     $cmake --build $B --target clang-bootstrap-deps
     $cmake --build $B --target stage2-distribution
-    sudo $cmake --build $B --target install stage2-install-distribution-stripped
-    sudo $cmake --build $B --target install stage2-install
+    $cmake --build $B --target install stage2-install-distribution-stripped
+    $cmake --build $B --target install stage2-install
     
 }
 
-llvm-strip()
+llvm-Prep-Devel()
 {
-    find /opt/llvm-15.0.7/bin/ -type f -executable -exec sudo /opt/llvm-15.0.7/bin/llvm-strip --strip-unneeded {}  \;
-
+    set -x
+    mkdir -p $B
+    cd $B
+    CC=gcc CXX=g++ $cmake -G Ninja \
+      -DCMAKE_INSTALL_PREFIX="$D" \
+      -C $root_dir/Devel.cmake "$S/llvm"
 }
-llvm-updatecache()
+
+llvm-Build-Devel()
+{    
+    #$cmake --build $B
+    $cmake --build $B --target install-distribution-stripped
+    ninja -C $B install-lldb-stripped install-lldb-server-stripped install-lldb-python-scripts-stripped install-lldb-instr-stripped install-lldb-vscode-stripped
+     ninja -C $B install liblldb
+}
+
+llvm-UpdateCache()
 {
-    c=/etc/ld.so.conf.d/llvm15.conf
+    c=/etc/ld.so.conf.d/llvm17.conf
     echo $D/lib | sudo tee $c
     echo $D/lib/x86_64-unknown-linux-gnu | sudo tee -a $c
     sudo ldconfig
 }
 
-llvm-alternatives()
+llvm-UpdateAlternatives()
 {
     set -x
     sudo bash -c " \
@@ -75,6 +87,7 @@ llvm-alternatives()
     "
 }
 
-#llvm-Prep-Local
-#llvm-Build-Local
-#llvm-updatecache
+llvm-Prep-Devel
+llvm-Build-Devel
+llvm-UpdateCache
+llvm-UpdateAlternatives
